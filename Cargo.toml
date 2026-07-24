@@ -11,5 +11,6 @@ members = [
     "crates/benz_notification",
     "crates/benz_parser_gdebenz",
     "crates/benz_parser_benzest",
+    "crates/benz_location",
     "crates/benz_utils",
 ]

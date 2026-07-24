@@ -1,0 +1,29 @@
+[package]
+name = "benz_mobile"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "benz_mobile_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-geolocation = "2"
+tauri-plugin-notification = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1", features = ["v5", "serde"] }
+tokio = { version = "1", features = ["full"] }
+tracing = "0.1"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+
+benz_models = { path = "../../../crates/benz_models" }
+benz_core = { path = "../../../crates/benz_core" }
+benz_location = { path = "../../../crates/benz_location" }
+benz_parser_gdebenz = { path = "../../../crates/benz_parser_gdebenz" }
+benz_parser_benzest = { path = "../../../crates/benz_parser_benzest" }

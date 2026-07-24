@@ -199,9 +199,9 @@ pub fn station_from_dto(dto: BenzEstStationDto) -> Station {
         map_brand(&name)
     };
 
-    /// Преобразование DTO топлива в FuelAvailability.
-    /// checked_at берётся из price_updated_at (ISO 8601) — именно это поле
-    /// используется UnifiedProvider для определения свежести данных.
+    // Преобразование DTO топлива в FuelAvailability.
+    // checked_at берётся из price_updated_at (ISO 8601) — именно это поле
+    // используется UnifiedProvider для определения свежести данных.
     let fuels: Vec<FuelAvailability> = dto.fuels.into_iter().map(fuel_from_dto).collect();
 
     // Сбор тегов из API

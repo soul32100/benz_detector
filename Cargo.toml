@@ -3,7 +3,7 @@ resolver = "2"
 
 members = [
     "apps/desktop",
-    "apps/mobile",
+    "apps/mobile/src-tauri",
 
     "crates/benz_core",
     "crates/benz_database",

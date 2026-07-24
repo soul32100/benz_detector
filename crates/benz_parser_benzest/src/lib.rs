@@ -1,14 +1,8 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+/// Парсер сайта benzest.ru — получение АЗС, цен, тегов и комментариев.
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub mod client;
+pub mod dto;
+pub mod mapper;
+pub mod provider;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+pub use provider::BenzEstProvider;

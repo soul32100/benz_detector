@@ -1,6 +1,8 @@
+/// Бренды сетей АЗС.
+
 use serde::{Deserialize, Serialize};
 
-/// название заправок
+/// Сеть АЗС по названию бренда.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Brand {
     Lukoil,
@@ -8,5 +10,6 @@ pub enum Brand {
     Rosneft,
     Bashneft,
     Tatneft,
+    /// Неизвестный или нераспознанный бренд (содержит сырое название).
     Unknown(String),
 }

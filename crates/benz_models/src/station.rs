@@ -6,8 +6,20 @@ use uuid::Uuid;
 
 use crate::brand::Brand;
 use crate::fuel_availability::FuelAvailability;
+use crate::provider::Provider;
 use crate::station_overall_status::StationOverallStatus;
 use crate::station_tag::StationTagInfo;
+
+/// Комментарий водителя о станции.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Comment {
+    /// Текст комментария.
+    pub text: String,
+    /// Время создания.
+    pub created_at: Option<DateTime<Utc>>,
+    /// Источник (benzest / gdebenz).
+    pub provider: Provider,
+}
 
 /// Автозаправочная станция.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -36,4 +48,6 @@ pub struct Station {
     pub last_updated: Option<DateTime<Utc>>,
     /// Количество отметок от водителей за последние 24 часа.
     pub reports_24h: Option<i32>,
+    /// Комментарии водителей.
+    pub comments: Vec<Comment>,
 }

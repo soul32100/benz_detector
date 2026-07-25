@@ -36,6 +36,36 @@ pub struct LocationDto {
 // ── Tauri команды ────────────────────────────────────────────────────────────
 
 #[tauri::command]
+async fn reverse_geocode(
+    state: tauri::State<'_, AppState>,
+    lat: f64,
+    lon: f64,
+) -> Result<String, String> {
+    let url = format!(
+        "https://nominatim.openstreetmap.org/reverse?lat={}&lon={}&format=json&accept-language=ru",
+        lat, lon
+    );
+    let resp = state
+        .http_client
+        .get(&url)
+        .header("User-Agent", "BenzDetector/0.1 (mobile)")
+        .send()
+        .await
+        .map_err(|e| format!("{e}"))?;
+    let text = resp.text().await.map_err(|e| format!("{e}"))?;
+    let obj: serde_json::Value =
+        serde_json::from_str(&text).map_err(|e| format!("{e}"))?;
+    let city = obj["address"]["city"]
+        .as_str()
+        .or_else(|| obj["address"]["town"].as_str())
+        .or_else(|| obj["address"]["village"].as_str())
+        .or_else(|| obj["address"]["municipality"].as_str())
+        .unwrap_or("")
+        .to_string();
+    Ok(city)
+}
+
+#[tauri::command]
 async fn fetch_stations(
     state: tauri::State<'_, AppState>,
     lat: f64,
@@ -177,6 +207,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_geolocation::init())
         .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_store::Builder::default().build())
         .manage(AppState {
             http_client,
             monitor_handle: Mutex::new(None),
@@ -185,6 +216,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             fetch_stations,
             search_city,
+            reverse_geocode,
             start_monitor,
             stop_monitor,
         ])

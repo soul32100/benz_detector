@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { fuelLabel, fuelCell, statusDisplay, stationName } from "../lib/stations";
+  import { fuelLabel, fuelCell, statusDisplay, stationName, providerIcon } from "../lib/stations";
   import type { Page, Station } from "../lib/types";
 
-  export let navigate: (p: Page, data?: Station[] | string[]) => void;
+  export let navigate: (p: Page, data?: Station[]) => void;
   export let stations: Station[] = [];
+  export let devMode = false;
 
   let selected = new Set<string>();
 
@@ -17,12 +18,15 @@
   }
 
   function goDetail(s: Station) {
-    navigate("detail", [{ station: s } as any]);
+    navigate("detail", { station: s });
   }
 
   function goMonitor() {
     if (selected.size === 0) return;
-    navigate("monitor", Array.from(selected));
+    const tracked = stations
+      .filter((s) => selected.has(s.id))
+      .map((s) => ({ id: s.id, name: s.name || s.address || s.id, address: s.address || "" }));
+    navigate("monitor", tracked);
   }
 
   function selectAll() {
@@ -72,6 +76,9 @@
           {#each s.fuels as f}
             <span class="fuel-chip">
               {fuelLabel(f.fuel_type)} {fuelCell(f.status, f.price)}
+              {#if devMode}
+                <span class="provider-badge">{providerIcon(f.provider)}</span>
+              {/if}
             </span>
           {/each}
         </div>

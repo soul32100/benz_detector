@@ -1,3 +1,9 @@
+export interface Comment {
+  text: string;
+  created_at: string | null;
+  provider: string;
+}
+
 export interface Station {
   id: string;
   osm_id: string;
@@ -11,6 +17,7 @@ export interface Station {
   overall_status: string;
   last_updated: string | null;
   reports_24h: number | null;
+  comments: Comment[];
 }
 
 export type Brand =
@@ -78,8 +85,15 @@ export interface TagChangeEvent {
   change_type: string;
 }
 
-export type Page = "home" | "stations" | "detail" | "monitor";
+export interface TrackedStation {
+  id: string;
+  name: string;
+  address: string;
+}
 
-export interface StationDetailParams {
-  station: Station;
+export type Page = "home" | "stations" | "detail" | "monitor" | "settings";
+
+export interface AppSettings {
+  devMode: boolean;
+  monitorInterval: number;
 }

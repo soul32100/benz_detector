@@ -10,7 +10,7 @@ use benz_models::fuel_status::FuelStatus;
 use benz_models::fuel_type::FuelType;
 use benz_models::id::canonical_station_id;
 use benz_models::provider::Provider;
-use benz_models::station::Station;
+use benz_models::station::{Comment, Station};
 use benz_models::station_overall_status::StationOverallStatus;
 use benz_models::station_tag::{StationTag, StationTagInfo, TagSource};
 
@@ -227,6 +227,20 @@ pub fn station_from_dto(dto: BenzEstStationDto) -> Station {
     // Удаление дубликатов тегов (Api приоритетнее Comment)
     dedup_tags(&mut tags);
 
+    // Извлечение комментариев водителей
+    let comments: Vec<Comment> = dto
+        .comments
+        .unwrap_or_default()
+        .into_iter()
+        .filter_map(|c| {
+            c.text.filter(|t| !t.is_empty()).map(|text| Comment {
+                text,
+                created_at: parse_comment_time(c.created_at.as_deref()),
+                provider: Provider::BenzEst,
+            })
+        })
+        .collect();
+
     // Парсинг времени последнего обновления станции
     let last_updated = dto
         .last_updated
@@ -247,6 +261,7 @@ pub fn station_from_dto(dto: BenzEstStationDto) -> Station {
         overall_status: map_overall_status(dto.status.as_deref()),
         last_updated,
         reports_24h: dto.reports_24h,
+        comments,
     }
 }
 

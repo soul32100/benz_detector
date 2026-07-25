@@ -113,6 +113,7 @@ pub fn station_from_dto(dto: StationDto) -> Station {
         overall_status: map_overall_status(dto.status.as_deref()),
         last_updated: None,
         reports_24h: None,
+        comments: vec![],
     }
 }
 
@@ -155,5 +156,6 @@ pub fn station_from_nearby_dto(dto: NearbyStationDto) -> Station {
         overall_status: map_overall_status(dto.status.as_deref()),
         last_updated,
         reports_24h: dto.confirmations,
+        comments: vec![],
     }
 }

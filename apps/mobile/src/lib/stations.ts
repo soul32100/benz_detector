@@ -14,6 +14,10 @@ export async function searchCity(query: string): Promise<LocationDto> {
   return invoke("search_city", { query });
 }
 
+export async function reverseGeocode(lat: number, lon: number): Promise<string> {
+  return invoke("reverse_geocode", { lat, lon });
+}
+
 export async function startMonitor(
   stationIds: string[],
   intervalMinutes: number,
@@ -135,4 +139,10 @@ export function stationName(s: Station): string {
   }
   const brandName = brandKey;
   return s.name || brandName;
+}
+
+export function providerIcon(provider: string): string {
+  if (provider.toLowerCase().includes("benzest")) return "🅱️";
+  if (provider.toLowerCase().includes("gdebenz")) return "🅶";
+  return provider.slice(0, 2);
 }

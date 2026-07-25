@@ -5,17 +5,45 @@
     statusDisplay,
     stationName,
     tagLabel,
+    providerIcon,
   } from "../lib/stations";
-  import type { Page, Station } from "../lib/types";
+  import type { Station } from "../lib/types";
 
-  export let navigate: (p: Page, data?: Station[]) => void;
+  export let onClose: () => void;
   export let station: Station;
+  export let tracked = false;
+  export let onToggleTrack: () => void;
+  export let devMode = false;
+
+  $: sortedComments = [...station.comments].sort((a, b) => {
+    if (!a.created_at && !b.created_at) return 0;
+    if (!a.created_at) return 1;
+    if (!b.created_at) return -1;
+    return b.created_at.localeCompare(a.created_at);
+  });
+
+  function openInMaps() {
+    if (station.latitude && station.longitude) {
+      const url = `https://2gis.ru/geo/${station.longitude},${station.latitude}`;
+      window.open(url, "_blank");
+    }
+  }
 </script>
 
 <div class="page">
-  <button class="btn btn-sm btn-secondary" on:click={() => navigate("stations")}>
-    ← Назад
-  </button>
+  <div class="flex-row" style="justify-content: space-between; align-items: center;">
+    <button class="btn btn-sm btn-secondary" on:click={onClose}>
+      ← Назад
+    </button>
+    <div class="flex-row gap-8">
+      <button class="btn btn-sm btn-secondary" on:click={openInMaps} disabled={!station.latitude || !station.longitude}>
+        📍 На карте
+      </button>
+      <button class="btn btn-sm {tracked ? 'btn-danger' : ''}" on:click={onToggleTrack}>
+        {tracked ? "📡 Отписаться" : "📡 Отслеживать"}
+      </button>
+    </div>
+  </div>
 
   <h1 class="page-title mt-8">{stationName(station)}</h1>
 
@@ -39,9 +67,11 @@
         <span style="font-weight: 600;">{fuelLabel(f.fuel_type)}</span>
         <span>{fuelCell(f.status, f.price)}</span>
       </div>
-      <div class="text-sm text-secondary">
-        {f.provider} · {new Date(f.checked_at).toLocaleString("ru-RU")}
-      </div>
+      {#if devMode}
+        <div class="text-sm text-secondary">
+          {providerIcon(f.provider)} {f.provider} · {new Date(f.checked_at).toLocaleString("ru-RU")}
+        </div>
+      {/if}
     {/each}
   </div>
 
@@ -65,4 +95,39 @@
       </p>
     {/if}
   </div>
+
+  {#if station.comments.length > 0}
+    <div class="card">
+      <div class="label">💬 Комментарии ({station.comments.length})</div>
+      {#each sortedComments.slice(0, 10) as c}
+        <div class="comment-item">
+          <div class="comment-text">{c.text}</div>
+          <div class="flex-row" style="justify-content: space-between;">
+            <span class="text-sm text-secondary">
+              {c.created_at ? new Date(c.created_at).toLocaleString("ru-RU") : "—"}
+            </span>
+            {#if devMode}
+              <span class="text-sm text-secondary">
+                {providerIcon(c.provider)} {c.provider}
+              </span>
+            {/if}
+          </div>
+        </div>
+      {/each}
+    </div>
+  {/if}
 </div>
+
+<style>
+  .comment-item {
+    background: var(--surface2);
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 6px;
+  }
+  .comment-text {
+    font-size: 14px;
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+</style>

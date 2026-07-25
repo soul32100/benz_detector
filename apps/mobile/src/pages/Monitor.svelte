@@ -6,10 +6,11 @@
     onStationChange,
     onMonitorError,
   } from "../lib/stations";
-  import type { Page, StationChangeEvent } from "../lib/types";
+  import type { StationChangeEvent, TrackedStation } from "../lib/types";
 
-  export let navigate: (p: Page, data?: Station[]) => void;
-  export let trackedIds: string[] = [];
+  export let onClose: () => void;
+  export let trackedStations: TrackedStation[] = [];
+  export let onRemoveTrack: (id: string) => void;
 
   let monitoring = false;
   let interval = 5;
@@ -44,7 +45,7 @@
   async function start() {
     errorMsg = "";
     try {
-      await startMonitor(trackedIds, interval);
+      await startMonitor(trackedStations.map((t) => t.id), interval);
       monitoring = true;
     } catch (e) {
       errorMsg = `${e}`;
@@ -89,19 +90,26 @@
 <div class="page">
   <div class="flex-row" style="justify-content: space-between; align-items: center;">
     <h1 class="page-title">📡 Мониторинг</h1>
-    <button class="btn btn-sm btn-secondary" on:click={() => navigate("home")}>
+    <button class="btn btn-sm btn-secondary" on:click={onClose}>
       ← Назад
     </button>
   </div>
 
   <div class="card">
-    <div class="label">Отслеживается станций: {trackedIds.length}</div>
-    <p class="text-sm text-secondary mt-8">
-      ID: {trackedIds.slice(0, 3).join(", ")}
-      {#if trackedIds.length > 3}
-        …и ещё {trackedIds.length - 3}
-      {/if}
-    </p>
+    <div class="label">Отслеживается станций: {trackedStations.length}</div>
+    <div class="mt-8">
+      {#each trackedStations as ts}
+        <div class="flex-row" style="justify-content: space-between; padding: 4px 0;">
+          <div>
+            <div style="font-size: 14px; font-weight: 500;">{ts.name}</div>
+            <div class="text-sm text-secondary">{ts.address}</div>
+          </div>
+          <button class="btn btn-sm btn-danger" on:click={() => onRemoveTrack(ts.id)}>
+            🗑️
+          </button>
+        </div>
+      {/each}
+    </div>
   </div>
 
   {#if !monitoring}
